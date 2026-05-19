@@ -1,0 +1,568 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Library Management System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1928;
+    --card: #21203a;
+    --accent: #e8b04b;
+    --accent2: #7c6af7;
+    --text: #fffffe;
+    --muted: #a7a9be;
+    --danger: #ef4565;
+    --success: #2cb67d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  header span {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 16px;
+    padding: 20px 40px;
+    background: var(--surface);
+    border-bottom: 1px solid #2e2d4a;
+  }
+
+  .stat {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 14px 24px;
+    border-left: 4px solid var(--accent);
+    min-width: 130px;
+  }
+
+  .stat.issued { border-color: var(--accent2); }
+  .stat.returned { border-color: var(--success); }
+
+  .stat .num {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat.issued .num { color: var(--accent2); }
+  .stat.returned .num { color: var(--success); }
+
+  .stat .label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  .container {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 0;
+    height: calc(100vh - 130px);
+  }
+
+  .form-panel {
+    background: var(--surface);
+    padding: 28px;
+    border-right: 1px solid #2e2d4a;
+    overflow-y: auto;
+  }
+
+  .form-panel h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #2e2d4a;
+  }
+
+  .field {
+            margin-bottom: 16px; 
+}
+  .field label { 
+                display: block; 
+               font-size: 0.78rem; 
+               color: var(--muted);
+               margin-bottom: 6px; 
+               letter-spacing: 0.5px; 
+               text-transform: uppercase;
+ }
+
+
+  .field input, .field select {
+                                width: 100%;
+                                background: var(--card);
+                                border: 1px solid #3a3858;
+                                color: var(--text);
+                                padding: 10px 14px;
+                                border-radius: 8px;
+                                font-family: 'DM Sans', sans-serif;
+                                font-size: 0.9rem;
+                                transition: border 0.2s;
+  }
+
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .btn {
+         width: 100%;
+       padding: 12px;
+       border: none;
+       border-radius: 8px;
+       font-family: 'DM Sans', sans-serif;
+       font-weight: 600;
+       font-size: 0.9rem;
+       cursor: pointer;
+       transition: all 0.2s;
+       margin-bottom: 10px;
+  }
+
+  .btn-primary {
+                  background: var(--accent); 
+                  color: #0f0e17; 
+}
+  .btn-primary:hover {
+                      background: #f0c060;
+                      transform: translateY(-1px);
+ }
+  .btn-secondary { 
+                     background: var(--accent2);
+                     color: white; 
+}
+  .btn-secondary:hover { 
+                         background: #9585f8; 
+}
+  .btn-danger { 
+                background: var(--danger); 
+                color: white; 
+}
+
+  .btn-danger:hover {
+                      background: #ff6070; 
+}
+
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    padding: 20px 28px;
+    border-bottom: 1px solid #2e2d4a;
+    background: var(--bg);
+  }
+
+  .search-bar input {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid #3a3858;
+    color: var(--text);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+  }
+
+  .search-bar input:focus { 
+                            outline: none;
+                            border-color: var(--accent); 
+}
+
+  .search-bar select {
+    background: var(--card);
+    border: 1px solid #3a3858;
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+  }
+
+  .list-panel { 
+                overflow-y: auto;
+                padding: 20px 28px; 
+                background: var(--bg);
+ }
+
+  .book-card {
+
+    background: var(--card);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    border-left: 4px solid var(--accent2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    animation: fadeIn 0.3s ease;
+    transition: transform 0.2s;
+  }
+
+  .book-card:hover { transform: translateX(4px); }
+  .book-card.issued-card { border-color: var(--danger); }
+  .book-card.returned-card { border-color: var(--success); }
+
+  @keyframes fadeIn { 
+                      from { opacity: 0; transform: translateY(10px); } 
+                      to { opacity: 1; transform: none; } 
+}
+
+  .book-info { flex: 1; }
+  .book-title { 
+                font-weight: 600;
+                font-size: 1rem;
+                color: var(--text); 
+}
+  .book-meta { 
+               font-size: 0.78rem; 
+               color: var(--muted); 
+               margin-top: 4px;
+               line-height: 1.6; 
+}
+
+  .badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .badge.available { 
+                    background: #1a3a2a;
+                    color: var(--success);
+ }
+  .badge.issued-b { 
+                    background: #3a1a22;
+                   color: var(--danger);
+ }
+
+  .book-actions { 
+                  display: flex;
+                 gap: 8px; 
+}
+
+  .icon-btn {
+    background: #2e2d4a;
+    border: none;
+    color: var(--muted);
+    padding: 7px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+
+  .icon-btn:hover {
+                    background: var(--accent); 
+                    color: #0f0e17;
+ }
+  .icon-btn.del:hover { 
+                       background: var(--danger); 
+                       color: white; 
+}
+
+  .empty {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted);
+  }
+
+  .empty .icon {
+                 font-size: 3rem;
+                 margin-bottom: 12px;
+ }
+  .empty p { font-size: 0.9rem; }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--success);
+    color: white;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: none;
+
+    z-index: 999;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+                       from { opacity:0; transform: translateY(20px); }
+                         to { opacity:1; transform: none; } 
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📚 Library Management System</h1>
+  <span>BCA Project | Web Technologies | HTML + CSS + JavaScript</span>
+</header>
+
+<div class="stats-bar">
+  <div class="stat">
+    <div class="num" id="totalCount">0</div>
+    <div class="label">Total Books</div>
+  </div>
+  <div class="stat issued">
+    <div class="num" id="issuedCount">0</div>
+    <div class="label">Issued</div>
+  </div>
+  <div class="stat returned">
+    <div class="num" id="availCount">0</div>
+    <div class="label">Available</div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- FORM PANEL -->
+  <div class="form-panel">
+    <h2>➕ Add New Book</h2>
+
+    <div class="field">
+      <label>Book ID</label>
+      <input type="text" id="bookId" placeholder="e.g. BK-001" />
+    </div>
+    <div class="field">
+      <label>Book Title</label>
+      <input type="text" id="bookTitle" placeholder="Enter book title" />
+    </div>
+    <div class="field">
+      <label>Author</label>
+      <input type="text" id="bookAuthor" placeholder="Author name" />
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select id="bookCategory">
+        <option value="">-- Select Category --</option>
+        <option>Programming</option>
+        <option>Mathematics</option>
+        <option>Networking</option>
+        <option>Database</option>
+        <option>AI / ML</option>
+        <option>General</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Year Published</label>
+      <input type="number" id="bookYear" placeholder="e.g. 2022" min="1900" max="2025"/>
+    </div>
+
+    <button class="btn btn-primary" onclick="addBook()">Add Book</button>
+
+    <h2 style="margin-top:24px;">📤 Issue / Return Book</h2>
+
+    <div class="field">
+
+      <label>Book ID</label>
+      <input type="text" id="issueId" placeholder="Enter Book ID" />
+    </div>
+    <div class="field">
+      <label>Student Name</label>
+      <input type="text" id="studentName" placeholder="Borrower's name" />
+    </div>
+
+    <button class="btn btn-secondary" onclick="issueBook()">Issue Book</button>
+    <button class="btn btn-danger" onclick="returnBook()">Return Book</button>
+  </div>
+
+  <!-- LIST PANEL -->
+  <div style="display:flex; flex-direction:column; overflow:hidden;">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="🔍  Search by title, author, or ID..." oninput="renderBooks()" />
+      <select id="filterStatus" onchange="renderBooks()">
+        <option value="all">All</option>
+        <option value="available">Available</option>
+        <option value="issued">Issued</option>
+      </select>
+      <select id="filterCategory" onchange="renderBooks()">
+        <option value="all">All Categories</option>
+        <option>Programming</option>
+        <option>Mathematics</option>
+        <option>Networking</option>
+        <option>Database</option>
+        <option>AI / ML</option>
+        <option>General</option>
+      </select>
+    </div>
+
+    <div class="list-panel" id="bookList"></div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── DATA ──
+  let books = JSON.parse(localStorage.getItem('lms_books') || '[]');
+
+  function save() {
+    localStorage.setItem('lms_books', JSON.stringify(books));
+    updateStats();
+    renderBooks();
+  }
+
+  // ── ADD BOOK ──
+  function addBook() {
+    const id       = document.getElementById('bookId').value.trim();
+    const title    = document.getElementById('bookTitle').value.trim();
+    const author   = document.getElementById('bookAuthor').value.trim();
+    const category = document.getElementById('bookCategory').value;
+    const year     = document.getElementById('bookYear').value.trim();
+
+    if (!id || !title || !author || !category) {
+      showToast('Please fill all required fields!', '#ef4565'); return;
+    }
+
+    if (books.find(b => b.id === id)) {
+      showToast('Book ID already exists!', '#ef4565'); return;
+    }
+
+    books.push({ id, title, author, category, year, status: 'available', issuedTo: '', issuedOn: '' });
+    save();
+
+    ['bookId','bookTitle','bookAuthor','bookYear'].forEach(i => 
+
+document.getElementById(i).value = '');
+    document.getElementById('bookCategory').value = '';
+    showToast('Book added successfully! ✓');
+  }
+
+  // ── ISSUE ──
+  function issueBook() {
+    const id      = document.getElementById('issueId').value.trim();
+    const student = document.getElementById('studentName').value.trim();
+    if (!id || !student) { showToast('Enter Book ID and Student Name!', '#ef4565'); return; }
+
+    const book = books.find(b => b.id === id);
+    if (!book) { showToast('Book ID not found!', '#ef4565'); return; }
+    if (book.status === 'issued') { showToast(`Already issued to ${book.issuedTo}!`, '#ef4565'); return; }
+
+    book.status   = 'issued';
+    book.issuedTo = student;
+    book.issuedOn = new Date().toLocaleDateString('en-IN');
+    save();
+    showToast(`"${book.title}" issued to ${student} ✓`);
+    document.getElementById('issueId').value = '';
+    document.getElementById('studentName').value = '';
+  }
+
+  // ── RETURN ──
+  function returnBook() {
+    const id = document.getElementById('issueId').value.trim();
+    if (!id) { showToast('Enter Book ID!', '#ef4565'); return; }
+
+    const book = books.find(b => b.id === id);
+    if (!book) { showToast('Book ID not found!', '#ef4565'); return; }
+    if (book.status === 'available') { showToast('Book is already available!', '#ef4565'); return; }
+
+    book.status = 'available';
+    book.issuedTo = '';
+    book.issuedOn = '';
+    save();
+    showToast(`"${book.title}" returned successfully ✓`);
+    document.getElementById('issueId').value = '';
+  }
+
+  // ── DELETE ──
+  function deleteBook(id) {
+    if (!confirm('Delete this book?')) return;
+    books = books.filter(b => b.id !== id);
+    save();
+    showToast('Book deleted.', '#ef4565');
+  }
+
+  // ── RENDER ──
+  function renderBooks() {
+    const q        = document.getElementById('searchInput').value.toLowerCase();
+    const status   = document.getElementById('filterStatus').value;
+    const category = document.getElementById('filterCategory').value;
+
+    let filtered = books.filter(b => {
+      const matchQ  = b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q) || b.id.toLowerCase().includes(q);
+      const matchS  = status === 'all' || b.status === status;
+      const matchC  = category === 'all' || b.category === category;
+      return matchQ && matchS && matchC;
+    });
+
+    const list = document.getElementById('bookList');
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty"><div class="icon">📭</div><p>No books found.</p></div>`;
+
+      return;
+    }
+
+    list.innerHTML = filtered.map(b => `
+      <div class="book-card ${b.status === 'issued' ? 'issued-card' : 'returned-card'}">
+        <div class="book-info">
+          <div class="book-title">${b.title}</div>
+          <div class="book-meta">
+            🆔 ${b.id} &nbsp;|&nbsp; ✍️ ${b.author} &nbsp;|&nbsp; 🏷️ ${b.category} &nbsp;|&nbsp; 📅 ${b.year || 'N/A'}
+            ${b.status === 'issued' ? `<br>👤 Issued to: <strong>${b.issuedTo}</strong> on ${b.issuedOn}` : ''}
+          </div>
+        </div>
+        <span class="badge ${b.status === 'available' ? 'available' : 'issued-b'}">
+          ${b.status === 'available' ? '✅ Available' : '🔴 Issued'}
+        </span>
+        <div class="book-actions">
+          <button class="icon-btn del" onclick="deleteBook('${b.id}')">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── STATS ──
+  function updateStats() {
+    document.getElementById('totalCount').textContent  = books.length;
+    document.getElementById('issuedCount').textContent = books.filter(b => b.status === 'issued').length;
+    document.getElementById('availCount').textContent  = books.filter(b => b.status === 'available').length;
+  }
+
+  // ── TOAST ──
+  function showToast(msg, color = '#2cb67d') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = color;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  // ── INIT ──
+  updateStats();
+  renderBooks();
+</script>
+</body>
+</html>
